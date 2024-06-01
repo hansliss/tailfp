@@ -101,7 +101,8 @@ char *newestFile(char *filePattern) {
 // after a set time.
 int main(int argc, char **argv)
 {
-  int debug = 1;
+  // May want to make this a command-line flag, thus not a #define
+  int debug = 0;
   char *filePattern = argv[1];
   char *filename = NULL;
   static struct openfile_s infiles[MAXOPENFILES];
