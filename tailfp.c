@@ -11,21 +11,27 @@
 #define MAXOPENFILES 32
 #define MAXFILEAGE 600
 
-char *lastFile(char *filePattern) {
+char *lastFile(char *filePattern, int debug) {
   glob_t globList;
   char *ret = NULL;
   int gres = glob(filePattern, GLOB_PERIOD, NULL, &globList);
   switch(gres) {
   case GLOB_NOSPACE:
-    // fprintf(stderr, "Ran out of space.\n");
+    if (debug) {
+      fprintf(stderr, "Ran out of space.\n");
+    }
     return NULL;
     break;
-  case GLOB_NOMATCH:
-    // fprintf(stderr, "No match.\n");
+  case GLOB_NOMATCH: 
+    if (debug) {
+      fprintf(stderr, "No match.\n");
+    }
     return NULL;
     break;
   case GLOB_ABORTED:
-    // fprintf(stderr, "Aborted.\n");
+    if (debug) {
+      fprintf(stderr, "Aborted.\n");
+    }
     return NULL;
     break;
   }
@@ -54,22 +60,28 @@ int tcompare(const void *av, const void *bv) {
   return (b->lastmod > a->lastmod)?1:((b->lastmod < a->lastmod)?-1:0);
 }
 
-char *newestFile(char *filePattern) {
+char *newestFile(char *filePattern, int debug) {
   glob_t globList;
   struct stat fstats;
   int gres = glob(filePattern, GLOB_PERIOD, NULL, &globList);
   char *ret = NULL;
   switch(gres) {
   case GLOB_NOSPACE:
-    // fprintf(stderr, "Ran out of space.\n");
+    if (debug) {
+      fprintf(stderr, "Ran out of space.\n");
+    }
     return NULL;
     break;
   case GLOB_NOMATCH:
-    // fprintf(stderr, "No match.\n");
+    if (debug) {
+      fprintf(stderr, "No match.\n");
+    }
     return NULL;
     break;
   case GLOB_ABORTED:
-    // fprintf(stderr, "Aborted.\n");
+    if (debug) {
+      fprintf(stderr, "Aborted.\n");
+    }
     return NULL;
     break;
   }
@@ -122,6 +134,7 @@ int main(int argc, char **argv)
 	  if (nRead > 0) {
 	    didread = 1;
 	    fwrite(inbuf, 1, nRead, stdout);
+	    fflush(stdout);
 	    infiles[i].lastchange = time(NULL);
 	  }
 	} while (nRead > 0);
@@ -139,7 +152,7 @@ int main(int argc, char **argv)
 	}
       }
     }
-    filename = newestFile(filePattern);
+    filename = newestFile(filePattern, debug);
     int isOpen = 0;
     if (filename != NULL) {
       for (int i=0; i<MAXOPENFILES; i++) {
